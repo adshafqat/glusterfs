@@ -149,10 +149,11 @@ Step 8: Start Volume
 [root@glusterserver2 brick]# gluster volume start distvol
 volume start: distvol: success
 
+gluster volume info
+
 Status of gluster servers
 
 gluster peer status
-
 
 
 Client Installation
