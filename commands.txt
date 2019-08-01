@@ -1,0 +1,28 @@
+On all servers
+
+vi /etc/hosts
+
+172.16.8.31 glusterserver1
+172.16.8.32 glusterserver2
+172.16.8.33 glusterserver3
+
+Install Gluster server on all servers
+
+~]# yum install centos-release-gluster -y
+~]# yum install epel-release -y
+~]# yum install glusterfs-server -y
+
+Enable Server
+
+~]# systemctl start glusterd
+~]# systemctl enable glusterd
+
+Enable required ports on all servers
+
+~]# sudo systemctl enable firewalld
+~]# reboot
+~]# firewall-cmd --zone=public --add-port=24007-24008/tcp --permanent
+~]# firewall-cmd --zone=public --add-port=24009/tcp --permanent
+~]# firewall-cmd --zone=public --add-service=nfs --add-service=samba --add-service=samba-client --permanent
+~]# firewall-cmd --zone=public --add-port=111/tcp --add-port=139/tcp --add-port=445/tcp --add-port=965/tcp --add-port=2049/tcp --add-port=38465-38469/tcp --add-port=631/tcp --add-port=111/udp --add-port=963/udp --add-port=49152-49251/tcp --permanent
+~]# firewall-cmd --reload
