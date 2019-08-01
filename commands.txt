@@ -1,3 +1,8 @@
+https://www.linuxtechi.com/setup-glusterfs-storage-on-centos-7-rhel-7/
+https://wiki.centos.org/HowTos/GlusterFSonCentOS
+
+Step 1: Modify host file
+
 On all servers
 
 vi /etc/hosts
@@ -5,8 +10,9 @@ vi /etc/hosts
 172.16.8.31 glusterserver1
 172.16.8.32 glusterserver2
 172.16.8.33 glusterserver3
+172.16.8.34 glusterserver4
 
-Install Gluster server on all servers
+Step 2: Install Gluster server on all servers
 
 ~]# yum install centos-release-gluster -y
 ~]# yum install epel-release -y
@@ -17,7 +23,7 @@ Enable Server
 ~]# systemctl start glusterd
 ~]# systemctl enable glusterd
 
-Enable required ports on all servers
+Step 3: Enable required ports on all servers
 
 ~]# sudo systemctl enable firewalld
 ~]# reboot
@@ -26,3 +32,143 @@ Enable required ports on all servers
 ~]# firewall-cmd --zone=public --add-service=nfs --add-service=samba --add-service=samba-client --permanent
 ~]# firewall-cmd --zone=public --add-port=111/tcp --add-port=139/tcp --add-port=445/tcp --add-port=965/tcp --add-port=2049/tcp --add-port=38465-38469/tcp --add-port=631/tcp --add-port=111/udp --add-port=963/udp --add-port=49152-49251/tcp --permanent
 ~]# firewall-cmd --reload
+
+
+Step 4:
+
+First Create a storage pool for only two server. The other two servers will be use setup Distribute Replicate Volumes 
+
+Create Storage Pool
+
+[root@glusterserver1 adeelshafqat]# gluster peer probe glusterserver2
+peer probe: success. 
+
+[root@glusterserver1 adeelshafqat]# gluster peer status
+
+
+Step 5: Create Data Brick
+
+Make sure a device is avilable. In my case, I have attached a 30 gb disk (dev/sdc) 
+
+[root@glusterserver2 adeelshafqat]# lsblk
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+fd0      2:0    1    4K  0 disk 
+sda      8:0    0   30G  0 disk 
+├─sda1   8:1    0  500M  0 part /boot
+└─sda2   8:2    0 29.5G  0 part /
+sdb      8:16   0   16G  0 disk 
+└─sdb1   8:17   0   16G  0 part /mnt/resource
+sdc      8:32   0   32G  0 disk 
+sr0     11:0    1 1024M  0 rom  
+
+[root@glusterserver2 adeelshafqat]# pvcreate /dev/sdc
+  Physical volume "/dev/sdc" successfully created.
+
+[root@glusterserver2 adeelshafqat]# vgcreate vg_gluster /dev/sdc
+  Volume group "vg_gluster" successfully created
+
+[root@glusterserver2 adeelshafqat]# lvcreate -L 25G -n brick2 vg_gluster
+  Logical volume "brick2" created.
+
+[root@glusterserver2 adeelshafqat]# lsblk
+NAME                MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+fd0                   2:0    1    4K  0 disk 
+sda                   8:0    0   30G  0 disk 
+├─sda1                8:1    0  500M  0 part /boot
+└─sda2                8:2    0 29.5G  0 part /
+sdb                   8:16   0   16G  0 disk 
+└─sdb1                8:17   0   16G  0 part /mnt/resource
+sdc                   8:32   0   32G  0 disk 
+└─vg_gluster-brick2 253:0    0   25G  0 lvm  
+sr0                  11:0    1 1024M  0 rom  
+[root@glusterserver2 adeelshafqat]# 
+
+Setup XFS file systems:
+
+[root@glusterserver2 adeelshafqat]# mkfs.xfs /dev/vg_gluster/brick2
+meta-data=/dev/vg_gluster/brick2 isize=512    agcount=4, agsize=1638400 blks
+         =                       sectsz=4096  attr=2, projid32bit=1
+         =                       crc=1        finobt=0, sparse=0
+data     =                       bsize=4096   blocks=6553600, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0 ftype=1
+log      =internal log           bsize=4096   blocks=3200, version=2
+         =                       sectsz=4096  sunit=1 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+
+
+[root@glusterserver2 adeelshafqat]# mkdir -p /bricks/brick2
+
+[root@glusterserver2 adeelshafqat]# mount /dev/vg_gluster/brick2 /bricks/brick2
+
+
+Extend the /etc/fstab:
+[root@glusterserver2 adeelshafqat]# vi /etc/fstab
+/dev/vg_gluster/brick2  /bricks/brick2    xfs     defaults    0 0
+
+[root@glusterserver2 adeelshafqat]# lsblk
+NAME                MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+fd0                   2:0    1    4K  0 disk 
+sda                   8:0    0   30G  0 disk 
+├─sda1                8:1    0  500M  0 part /boot
+└─sda2                8:2    0 29.5G  0 part /
+sdb                   8:16   0   16G  0 disk 
+└─sdb1                8:17   0   16G  0 part /mnt/resource
+sdc                   8:32   0   32G  0 disk 
+└─vg_gluster-brick2 253:0    0   25G  0 lvm  /bricks/brick2
+sr0                  11:0    1 1024M  0 rom 
+
+create a directory with brick under the mount point
+
+mkdir /bricks/brick2/brick
+
+Step 6: Create distributed volume using below gluster command on Server 1
+
+[root@glusterserver1 adeelshafqat]# gluster volume create distvol glusterserver1:/bricks/brick1/brick glusterserver2:/bricks/brick2/brick 
+volume create: distvol: success: please start the volume to access data
+
+
+[root@glusterserver1 adeelshafqat]# gluster volume info distvol
+ 
+Volume Name: distvol
+Type: Distribute
+Volume ID: dab18a9a-ee45-4651-9562-dede3da9e152
+Status: Created
+Snapshot Count: 0
+Number of Bricks: 2
+Transport-type: tcp
+Bricks:
+Brick1: glusterserver1:/bricks/brick1/brick
+Brick2: glusterserver2:/bricks/brick2/brick
+Options Reconfigured:
+transport.address-family: inet
+nfs.disable: on
+
+Step 8: Start Volume
+
+[root@glusterserver2 brick]# gluster volume start distvol
+volume start: distvol: success
+
+Status of gluster servers
+
+gluster peer status
+
+
+
+Client Installation
+
+[root@glusterserver4 adeelshafqat]# yum install glusterfs-fuse -y
+Loaded plugins: fastestmirror, langpacks
+Loading mirror speeds from cached hostfile
+ * centos-gluster6: mirrors.vooservers.com
+ * epel: mirrors.coreix.net
+Package glusterfs-fuse-6.4-1.el7.x86_64 already installed and latest version
+Nothing to do
+
+[root@glusterserver4 adeelshafqat]# mkdir /mnt/distvol
+
+[root@glusterserver4 glusterfs]# mount -t glusterfs glusterserver1:/distvol /mnt/distvol/
+
+
+Log files are stored in /var/log/glusterfs/ folder
+
