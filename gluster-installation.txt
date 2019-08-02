@@ -214,6 +214,39 @@ glusterserver3:/replicavol    fuse.glusterfs   25G  289M   25G   2% /mnt/replica
 
 Distributed Replica Volume
 
+[root@glusterserver1 mnt]# gluster peer probe glusterserver3
+peer probe: success. 
+[root@glusterserver1 mnt]# gluster peer probe glusterserver4
+peer probe: success. 
+
+[root@glusterserver1 mnt]# gluster volume create dist-rep-vol replica 2 glusterserver1:/bricks/brick1/brick glusterserver2:/bricks/brick2/brick  glusterserver3:/bricks/brick3/brick glusterserver4:/bricks/brick4/brick
+Replica 2 volumes are prone to split-brain. Use Arbiter or Replica 3 to avoid this. See: http://docs.gluster.org/en/latest/Administrator%20Guide/Split%20brain%20and%20ways%20to%20deal%20with%20it/.
+Do you still want to continue?
+ (y/n) y
+volume create: dist-rep-vol: success: please start the volume to access data
+
+[root@glusterserver1 mnt]# gluster volume info
+ 
+Volume Name: dist-rep-vol
+Type: Distributed-Replicate
+Volume ID: 27c7cd90-b0ae-4340-bd84-2ca8eaccda4b
+Status: Created
+Snapshot Count: 0
+Number of Bricks: 2 x 2 = 4
+Transport-type: tcp
+Bricks:
+Brick1: glusterserver1:/bricks/brick1/brick
+Brick2: glusterserver2:/bricks/brick2/brick
+Brick3: glusterserver3:/bricks/brick3/brick
+Brick4: glusterserver4:/bricks/brick4/brick
+Options Reconfigured:
+transport.address-family: inet
+nfs.disable: on
+performance.client-io-threads: off
+[root@glusterserver1 mnt]# 
+
+
+
 
 
 
@@ -228,6 +261,27 @@ volume delete: replicavol: success
 [root@glusterserver3 /]# 
 
 
+[root@glusterserver3 /]# gluster peer detach glusterserver4
+All clients mounted through the peer which is getting detached need to be remounted using one of the other active peers in the trusted storage pool to ensure client gets notification on any changes done on the gluster configuration and if the same has been done do you want to proceed? (y/n) y
+peer detach: success
+
+
+Client
+[root@glusterserver4 mnt]# mkdir /mnt/distreplicatevol
+
+[root@glusterserver4 mnt]# mount -t glusterfs glusterserver1:/dist-rep-vol /mnt/distreplicatevol/
+Mount failed. Please check the log file for more details.
+
+[root@glusterserver4 mnt]# cd /var/log/glusterfs/
+
+[root@glusterserver4 glusterfs]# gluster volume status
+Volume dist-rep-vol is not started
+
+[root@glusterserver1 mnt]# gluster volume start dist-rep-vol
+volume start: dist-rep-vol: success
+[root@glusterserver1 mnt]# 
+
+[root@glusterserver4 glusterfs]# mount -t glusterfs glusterserver1:/dist-rep-vol /mnt/distreplicatevol/
 
 
 Exceptions
@@ -245,8 +299,8 @@ Solution
 
 Run this on all nodes, change brick name accordingly
 
-setfattr -x trusted.glusterfs.volume-id /bricks/brick2/brick
-setfattr -x trusted.gfid /bricks/brick2/brick
-rm -rf /bricks/brick2/brick/.glusterfs
+setfattr -x trusted.glusterfs.volume-id /bricks/brick1/brick
+setfattr -x trusted.gfid /bricks/brick1/brick
+rm -rf /bricks/brick1/brick/.glusterfs
 
 
