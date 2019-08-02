@@ -1,0 +1,93 @@
+Command	Description
+Volume
+gluster volume info [all | VOLNAME]	Displays information about all volumes, or the specified volume.
+gluster volume create NEW-VOLNAME [stripe COUNT] [replica COUNT] [transport tcp | rdma | tcp,rdma] NEW-BRICK ...	Creates a new volume of the specified type using the specified bricks and transport type (the default transport type is tcp).
+gluster volume delete VOLNAME	Deletes the specified volume.
+gluster volume start VOLNAME	Starts the specified volume.
+gluster volume stop VOLNAME [force]	Stops the specified volume.
+gluster volume list	Lists all volumes in the trusted storage pool.
+gluster volume help	Displays help for the volume command.
+Brick
+gluster volume add-brick VOLNAME [<stripe|replica> <COUNT>] NEW-BRICK ...	Adds the specified bricks to the specified volume.
+gluster volume remove-brick VOLNAME [(replica COUNT)|(stripe COUNT)] BRICK ...	Removes the specified bricks from the specified volume.
+gluster volume set VOLNAME <KEY> <VALUE>	Sets the specified option and value for the specified volume.
+gluster volume sync HOSTNAME [all| VOLNAME]	Syncs the volume information from a peer.
+gluster volume reset VOLNAME [option] [force]	Resets specified or all reconfigured options to its default value.
+gluster volume replace-brick VOLNAME (BRICK NEW-BRICK) {start | pause | abort | status}	Replaces the specified brick.
+gluster volume replace-brick VOLNAME BRICK NEW-BRICK pause	Starts migration of data from one brick to another.
+gluster volume replace-brick VOLNAME BRICK NEW-BRICK pause	Pauses migration of data.
+gluster volume replace-brick VOLNAME BRICK NEW-BRICK pause	Aborts migration of data.
+gluster volume replace-brick VOLNAME BRICK NEW-BRICK pause	Displays the status of data migration.
+gluster volume replace-brick VOLNAME BRICK NEW-BRICK commit	Commits the migration of data from one brick to another .
+Profile
+gluster volume profile VOLNAME start	Starts the profiling to view the file operation information for each brick.
+gluster volume profile VOLNAME info [nfs]	Displays the I/O information for each brick or NFS servers.
+gluster volume profile VOLNAME stop	Stops profiling the specified volume.
+Quota
+gluster volume quota VOLNAME enable [path] [value]	Enables quota to set disk limits.
+gluster volume quota VOLNAME disable [path] [value]	Disables quota set on the volume.
+gluster volume quota VOLNAME limit-usage [path] [value]	Sets the desk limit.
+gluster volume quota VOLNAME list [path] [value]	Display disk limit information set on the directories.
+gluster volume quota VOLNAME remove [path] [value]	Deletes the quota limit set on the directory.
+Status
+gluster volume status [all | VOLNAME [nfs|shd|BRICK>]] [detail|clients|mem|inode|fd|callpool]	Displays status of all or specified volumes or bricks.
+gluster volume status all	Displays information about all volumes.
+gluster volume status VOLNAME detail	Displays additional information about the bricks.
+gluster volume status VOLNAME clients	Displays the list of clients accessing the volumes.
+gluster volume status VOLNAME mem	Displays the memory usage and memory pool details of the bricks.
+gluster volume status VOLNAME inode	Displays the inode tables of the volume.
+gluster volume status VOLNAME fd	Displays the open file descriptor tables of the volume.
+gluster volume status VOLNAME callpool	Displays the pending calls of the volume.
+Self-Heal	
+gluster volume heal VOLNAME [options]	Self-heal commands on specified volume.
+gluster volume heal VOLNAME	Triggers self-heal only on the files which requires healing.
+gluster volume heal VOLNAME full	Triggers self-heal on all the files of a volume.
+gluster volume heal VOLNAME info	Displays the list of files that needs healing.
+gluster volume heal VOLNAME info healed	Displays the list of files that are self-healed.
+gluster volume heal VOLNAME info heal-failed	Displays the list of files of a particular volume on which the self-heal failed.
+Statedump		
+gluster volume statedump VOLNAME [nfs] [all|mem|iobuf|callpool|priv|fd|inode|history]	Performs statedump of a volume or NFS server .
+gluster volume set VOLNAME server.statedump-path path	Change the directory of the statedump file.
+Locks
+gluster volume clear-locks VOLNAME path kind {blocked | granted | all}{inode [range] | entry [basename] | posix [range]}	Clears the locks held on path.
+Top	
+gluster volume top VOLNAME open [nfs | brick BRICK-NAME] [list-cnt cnt]	Displays open file descriptor count and maximum file descriptor count of the specified brick/NFS server of the volume.
+gluster volume top VOLNAME read [nfs | brick BRICK-NAME] [list-cnt cnt]	Displays the list of highest file Read calls of the specified brick/NFS server of the volume.
+gluster volume top VOLNAME write [nfs | brick BRICK-NAME] [list-cnt cnt]	Displays the list of highest file Write calls of the specified brick/NFS server of the volume.
+gluster volume top VOLNAME opendir [nfs | brick BRICK-NAME] [list-cnt cnt]	Displays the list of open calls on each directory of the specified brick/NFS server of the volume.
+gluster volume top VOLNAME readdir [nfs | brick BRICK-NAME] [list-cnt cnt]	Displays the list of highest directory read calls on each brick of the specified brick/NFS server of the volume.
+gluster volume top VOLNAME read-perf [bs blk-size count count] [brick BRICK-NAME] [list-cnt cnt]	Displays the list list of read performance on each brick of the specified brick/NFS server of the volume.
+gluster volume top VOLNAME write-perf [bs blk-size count count] [nfs | brick BRICK-NAME] [list-cnt cnt]	Displays the list of write performance on each brick of the specified brick/NFS server of the volume.
+Rebalance
+gluster volume rebalance VOLNAME [fix-layout] {start|stop|status} [force]	Rebalance Operations
+gluster volume rebalance VOLNAME start	Starts rebalancing the specified volume.
+gluster volume rebalance VOLNAME stop	Stops rebalancing the specified volume.
+gluster volume rebalance VOLNAME status	Displays the rebalance status of the specified volume.
+Log
+volume log rotate VOLNAME [BRICK]	Rotates the log file for corresponding volume/brick.
+Peer
+peer probe HOSTNAME	Probes the specified peer.
+peer detach HOSTNAME	Detaches the specified peer.
+peer status	Displays the status of peers.
+peer help	Displays help for the peer command.
+Geo-replication
+volume geo-replication MASTER SLAVE start	Start geo-replication between the hosts specified by MASTER and SLAVE. You can specify a local master volume as :VOLNAME.
+You can specify a local slave volume as :VOLUME and a local slave directory as /DIRECTORY/SUB-DIRECTORY. You can specify a remote slave volume as DOMAIN::VOLNAME and a remote slave directory as DOMAIN:/DIRECTORY/SUB-DIRECTORY.
+volume geo-replication MASTER SLAVE stop	Stop geo-replication between the hosts specified by MASTER and SLAVE. You can specify a local master volume as :VOLNAME and a local master directory as /DIRECTORY/SUB-DIRECTORY.
+You can specify a local slave volume as :VOLNAME and a local slave directory as /DIRECTORY/SUB-DIRECTORY. You can specify a remote slave volume as DOMAIN::VOLNAME and a remote slave directory as DOMAIN:/DIRECTORY/SUB-DIRECTORY.
+volume geo-replication MASTER SLAVE log-rotate	Rotates the log file of a particular master-slave session.
+volume geo-replication MASTER SLAVE config [options]		Configure geo-replication options between the hosts specified by MASTER and SLAVE.
+gluster-log-file LOGFILE	The path to the geo-replication glusterfs log file.
+gluster-log-level LOGFILELEVEL	The log level for glusterfs processes.
+log-file LOGFILE	The path to the geo-replication log file.
+log-level LOGFILELEVEL	The log level for geo-replication.
+ssh-command COMMAND	The ssh command to use to connect to the remote machine (the default is ssh).
+rsync-command COMMAND	The rsync command to use for synchronizing the files (the default is rsync).
+volume_id= UID	The command to delete the existing master UID for the intermediate/slave node.
+timeout SECONDS	The timeout period.
+sync-jobs N	The number of simultaneous files/directories that can be synchronized.
+ignore-deletes	If this option is set to 1, a file deleted on master will not trigger a delete operation on the slave. Hence, the slave will remain as a superset of the master and can be used to recover the master in case of crash and/or accidental delete.
+checkpoint [LABEL | now]	Sets the checkpoint with the given option LABEL. If the option is set as now, then the current time will be used as label.
+Other
+help		Display the command options.
+quit		Exit the gluster command line interface.
