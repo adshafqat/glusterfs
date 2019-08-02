@@ -215,3 +215,38 @@ glusterserver3:/replicavol    fuse.glusterfs   25G  289M   25G   2% /mnt/replica
 Distributed Replica Volume
 
 
+
+
+
+
+[root@glusterserver3 /]# gluster volume stop replicavol
+Stopping volume will make its data inaccessible. Do you want to continue? (y/n) y
+volume stop: replicavol: success
+[root@glusterserver3 /]# gluster volume delete replicavol
+Deleting volume will erase all information about the volume. Do you want to continue? (y/n) y
+volume delete: replicavol: success
+[root@glusterserver3 /]# 
+
+
+
+
+Exceptions
+
+
+is already part of a volume
+
+[root@glusterserver1 mnt]#  gluster volume create dist-rep-vol replica 2 glusterserver1:/bricks/brick1/brick glusterserver2:/bricks/brick2/brick  glusterserver3:/bricks/brick3/brick glusterserver4:/bricks/brick4/brick
+
+volume create: dist-rep-vol: failed: /bricks/brick1/brick is already part of a volume
+[root@glusterserver1 mnt]# gluster volume info
+No volumes present
+
+Solution
+
+Run this on all nodes, change brick name accordingly
+
+setfattr -x trusted.glusterfs.volume-id /bricks/brick2/brick
+setfattr -x trusted.gfid /bricks/brick2/brick
+rm -rf /bricks/brick2/brick/.glusterfs
+
+
