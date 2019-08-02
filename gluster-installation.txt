@@ -173,3 +173,45 @@ Nothing to do
 
 Log files are stored in /var/log/glusterfs/ folder
 
+
+Replicate Volume
+
+gluster volume create replicavol replica 2 glusterserver3:/bricks/brick3/brick glusterserver4:/bricks/brick4/brick
+
+[root@glusterserver3 adeelshafqat]# gluster volume info replicavol
+ 
+Volume Name: replicavol
+Type: Replicate
+Volume ID: 764fa885-09c4-46cc-bb15-9893f239319f
+Status: Created
+Snapshot Count: 0
+Number of Bricks: 1 x 2 = 2
+Transport-type: tcp
+Bricks:
+Brick1: glusterserver3:/bricks/brick3/brick
+Brick2: glusterserver4:/bricks/brick4/brick
+Options Reconfigured:
+transport.address-family: inet
+nfs.disable: on
+performance.client-io-threads: off
+
+[root@glusterserver3 adeelshafqat]# gluster volume start replicavol
+volume start: replicavol: success
+
+
+[root@glusterserver4 brick]# df -Th
+Filesystem                    Type            Size  Used Avail Use% Mounted on
+/dev/sda2                     xfs              30G  1.4G   29G   5% /
+devtmpfs                      devtmpfs        2.0G     0  2.0G   0% /dev
+tmpfs                         tmpfs           2.0G     0  2.0G   0% /dev/shm
+tmpfs                         tmpfs           2.0G  9.0M  2.0G   1% /run
+tmpfs                         tmpfs           2.0G     0  2.0G   0% /sys/fs/cgroup
+/dev/sda1                     xfs             497M   81M  417M  17% /boot
+/dev/sdb1                     ext4            7.8G   36M  7.3G   1% /mnt/resource
+tmpfs                         tmpfs           394M     0  394M   0% /run/user/1000
+/dev/mapper/vg_gluster-brick4 xfs              25G   33M   25G   1% /bricks/brick4
+glusterserver3:/replicavol    fuse.glusterfs   25G  289M   25G   2% /mnt/replicavol
+
+Distributed Replica Volume
+
+
