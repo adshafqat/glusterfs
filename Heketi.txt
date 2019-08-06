@@ -1,0 +1,601 @@
+A minimum of three nodes are required in a Gluster trusted storage pool. The examples in this guide use three nodes, named node1, node2, and node3. Node names for each of the nodes in the pool must be resolvable on each host. You can achieve this either by configuring DNS correctly, or you can add host entries to the /etc/hosts file on each node.
+
+Prepare the hosts and make sure the glusterd service is running on each node to be used in the Heketi cluster.
+
+Do not create Gluster trusted storage pools or volumes using the gluster command.
+
+Do not format the disks to use for volumes. The disks must be in RAW format to use them with Heketi.
+
+
+Before you run a pod make sure Gluster libraries are installed on all OpenShift worker nodes. Check Exception section for more details
+
+
+https://docs.oracle.com/cd/E52668_01/F18418/html/gluster-heketi.html#gluster-heketi-install
+
+https://access.redhat.com/documentation/en-us/red_hat_gluster_storage/3.1/html/administration_guide/ch06s02
+
+https://www.youtube.com/watch?v=uaNZx2O9ihc
+
+heketi-cli --server http://172.16.8.40:8080 --user admin --secret admin volume list
+
+
+
+
+   27  yum install centos-release-gluster -y
+   28  yum install epel-release -y
+   29  yum install heketi
+   30  yum install heketi-client
+   31  cd /
+   32  ssh-keygen -f /etc/heketi/heketi_key -t rsa -N ''
+   33  ssh-copy-id -i /etc/heketi/heketi_key.pub root@172.16.8.36
+   34  cat /etc/heketi/heketi_key.pub
+   35  chown heketi:heketi /etc/heketi/heketi_key*
+   36  cd /ect/heketi
+   37  cd /ect/heketi
+   38  cd /etc/heketi
+   39  ls -lrt
+   40  ssh heketi_key root@172.16.8.36
+   41* ssh -i root@172.16.8.36
+   42  ssh -i heketi_key root@172.16.8.36
+   43  ssh -i heketi_key root@172.16.8.37
+
+
+
+
+
+
+  323  heketi-cli volume create --size=50
+  324  gluster volume info
+  325  gluster volume info
+  326  heketi-cli volume create --size=50
+  327  gluster volume info vol_20075fdfb097fa04473cae1e35598bd2
+  328  gluster volume info 20075fdfb097fa04473cae1e35598bd2
+  329  gluster volume info
+  330  gluster cluster info 225194577745138dd4a71fda2f51e5e0
+  331  gluster volume info all
+  332  gluster volume list
+  333  heketi-cli volume create --size=50
+  334  heketi-cli cluster list
+  335  heketi-cli cluster info 225194577745138dd4a71fda2f51e5e0
+  336  heketi-cli volume info 20075fdfb097fa04473cae1e35598bd2
+
+systemctl stop heketi
+systemctl start heketi
+systemctl status heketi
+
+
+
+yum install heketi
+[root@glusterserver1 log]# sudo -u heketi ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (/var/lib/heketi/.ssh/id_rsa): 
+Created directory '/var/lib/heketi/.ssh'.
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /var/lib/heketi/.ssh/id_rsa.
+Your public key has been saved in /var/lib/heketi/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:7hHAuet8eH3yTBnMlrxq9qlTKObRxyW04eGJQDsF+2w heketi@glusterserver1
+The key's randomart image is:
++---[RSA 2048]----+
+|       .o..      |
+|     . ..+  +    |
+|      + +. = =   |
+|       o +.+*..  |
+|      . S.EoBo   |
+|       o+oo.++   |
+|      .+o+ o+    |
+|     o..+.*+..   |
+|      oo.ooB=    |
++----[SHA256]-----+
+
+
+[root@glusterserver1 .ssh]# cat id_rsa.pub
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCw7kf86WZdy3Y3WA+KqbZek6y37PzcXQ1OUfwNVPWlEiU/mwPq1MystD5CeIbT5cbmoOfDOaePuE5Ng2o88wCpIRCb77icDILg6r9ZOOGNHZsyDusXtZBMOwT3v/5GJuZnP6Um6rkvL2EiCVqC8ITnWUygFoosPwwzb26K5o1NW6jSOSyKPhrq9xycKEepf6+UXYAtem2w5Gs+P2uzMF6Eo6DvsAvaeYx6yvi8c/PEj1onHGVUcerTuZRlGZYqBG0KhHY3XTk4VHdasS5vyQeouTB44oOjBOJPyuoH9/a2DvIn1Xt5294Rf3nD5VUpORgOb3HbZneEwxvN6RsmAg6p heketi@glusterserver1
+
+
+chown heketi:heketi /var/lib/heketi/.ssh/id_rsa*
+
+Copy this in all Gluster servers /root/.ssh/authorized_keys files
+
+
+
+	ssh-keygen -f /etc/heketi/heketi_key -t rsa -N ''
+   33  ssh-copy-id -i /etc/heketi/heketi_key.pub root@172.16.8.36
+   34  cat /etc/heketi/heketi_key.pub
+   35  chown heketi:heketi /etc/heketi/heketi_key*
+   36  cd /ect/heketi
+   37  cd /ect/heketi
+   38  cd /etc/heketi
+   39  ls -lrt
+   40  ssh heketi_key root@172.16.8.36
+   41* ssh -i root@172.16.8.36
+   42  ssh -i heketi_key root@172.16.8.36
+   43  ssh -i heketi_key root@172.16.8.37
+
+
+
+
+vi /etc/heketi/heketi.json
+
+Change  "executor": "mock”, to  "executor": “ssh",
+
+Change       "keyfile": "/root/.ssh/id_rsa”, to /var/lib/heketi/.ssh/id_rsa
+
+    "_sshexec_comment": "SSH username and private key file information",
+    "sshexec": {
+      "keyfile": "/etc/heketi/heketi_key",
+      "user": "root",
+      "port": "22",
+      "fstab": "/etc/fstab"
+    },
+
+
+Setup the heketi.json configuration file. The file is located in ß/etc/heketi/heketi.json. (at the bottom of the page)
+
+ systemctl enable heketi
+systemctl start heketi
+systemctl status heketi
+# chkconfig --add heketi
+# service heketi start
+
+# less /var/log/heketi
+hostname
+
+
+curl http://<hostname/server:port>/hello
+
+Heketi client can run on any computer. To install Heketi-cli, glisterfs should be installed
+
+# export HEKETI_CLI_SERVER=http://<heketi_server:port>
+# heketi-cli load -json=<topology_file>
+topology.json is at the Botton of this email.
+
+
+# heketi-cli topology load --json=topology.json
+[root@heketi heketi]# heketi-cli topology load --json=topology.json
+Creating cluster ... ID: 3affa5d8ae9f3c7fb3433cfd936f8f53
+	Allowing file volumes on cluster.
+	Allowing block volumes on cluster.
+	Creating node gserver1 ... ID: c235bb9beeb6603e25079e72af7f3d65
+		Adding device /dev/sdc ... OK
+	Creating node gserver2 ... ID: 36f36d1c04a31927ac350d1af20319cf
+		Adding device /dev/sdc ... OK
+
+
+[root@heketi heketi]# heketi-cli node list
+Id:36f36d1c04a31927ac350d1af20319cf	Cluster:3affa5d8ae9f3c7fb3433cfd936f8f53
+Id:c235bb9beeb6603e25079e72af7f3d65	Cluster:3affa5d8ae9f3c7fb3433cfd936f8f53
+
+
+# heketi-cli node info b455e763001d7903419c8ddd2f58aea0
+
+heketi-cli cluster list
+
+heketi-cli topology info
+
+Cluster Id: 3affa5d8ae9f3c7fb3433cfd936f8f53
+
+    File:  true
+    Block: true
+
+    Volumes:
+
+    Nodes:
+
+	Node Id: 36f36d1c04a31927ac350d1af20319cf
+	State: online
+	Cluster Id: 3affa5d8ae9f3c7fb3433cfd936f8f53
+	Zone: 1
+	Management Hostnames: gserver2
+	Storage Hostnames: 172.16.8.37
+	Devices:
+		Id:b26449b5f3ded2ee1c5f789084e170cc   Name:/dev/sdc            State:online    Size (GiB):31      Used (GiB):0       Free (GiB):31      
+			Bricks:
+
+	Node Id: c235bb9beeb6603e25079e72af7f3d65
+	State: online
+	Cluster Id: 3affa5d8ae9f3c7fb3433cfd936f8f53
+	Zone: 1
+	Management Hostnames: gserver1
+	Storage Hostnames: 172.16.8.36
+	Devices:
+		Id:f9834aca3b621b2f2d5699c4b754aba2   Name:/dev/sdc            State:online    Size (GiB):31      Used (GiB):0       Free (GiB):31      
+			Bricks:
+[root@heketi heketi]# 
+
+
+# heketi-cli cluster info a0d9021ad085b30124afbcf8df95ec06
+
+[root@heketi heketi]# heketi-cli volume create —-size=1
+Error: Failed to allocate new volume: No space (This could come when there are only two nodes in the Gluster cluster)
+
+This command fixed the issue
+
+heketi-cli volume create --durability=none --size=1
+
+Please note size is in GB
+
+[root@heketi heketi]# heketi-cli volume create --durability=none --size=1
+Name: vol_0ade45da0cfdf49d616f2b6409abd268
+Size: 1
+Volume Id: 0ade45da0cfdf49d616f2b6409abd268
+Cluster Id: 3affa5d8ae9f3c7fb3433cfd936f8f53
+Mount: 172.16.8.37:vol_0ade45da0cfdf49d616f2b6409abd268
+Mount Options: backup-volfile-servers=172.16.8.36
+Block: false
+Free Size: 0
+Reserved Size: 0
+Block Hosting Restriction: (none)
+Block Volumes: []
+Durability Type: none
+
+
+[root@heketi heketi]# heketi-cli volume list
+Id:0ade45da0cfdf49d616f2b6409abd268    Cluster:3affa5d8ae9f3c7fb3433cfd936f8f53    Name:vol_0ade45da0cfdf49d616f2b6409abd268
+
+[root@heketi heketi]# heketi-cli volume info 0ade45da0cfdf49d616f2b6409abd268
+Name: vol_0ade45da0cfdf49d616f2b6409abd268
+Size: 1
+Volume Id: 0ade45da0cfdf49d616f2b6409abd268
+Cluster Id: 3affa5d8ae9f3c7fb3433cfd936f8f53
+Mount: 172.16.8.37:vol_0ade45da0cfdf49d616f2b6409abd268
+Mount Options: backup-volfile-servers=172.16.8.36
+Block: false
+Free Size: 0
+Reserved Size: 0
+Block Hosting Restriction: (none)
+Block Volumes: []
+Durability Type: none
+
+
+
+
+
+
+
+Storage Class
+
+[adeelshafqat@master ~]$ cat storageclass.yaml
+apiVersion: storage.k8s.io/v1beta1
+kind: StorageClass
+metadata:
+ name: glusterfs-storageclass
+provisioner: kubernetes.io/glusterfs
+parameters:
+ resturl: "http://172.16.8.31:8080"
+ restauthenabled: “false"
+
+Pvc
+
+[adeelshafqat@master ~]$ cat heketipvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+ name: heketi-pvc
+spec:
+ accessModes:
+  - ReadWriteOnce
+ resources:
+  requests:
+   storage: 512Mi
+ storageClassName: glusterfs-storageclass
+
+Before you run a pod make sure Gluster libraries are installed on all worker nodes. On local Macbox it won’t work because GlusterFS Mac client libraries are not available. Check Exception section for more details
+
+Pod.yaml
+
+[adeelshafqat@master ~]$ cat pod.yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+ name: nginx
+spec:
+ containers:
+  - name: nginx
+    image: nginx
+    volumeMounts:
+     - name: propfile
+       mountPath: "/dev/tmp"
+ volumes:
+  - name: propfile
+    persistentVolumeClaim:
+     claimName: heketi-pvc
+[adeelshafqat@master ~]$ 
+
+
+
+
+
+
+
+OpenShift based installation
+
+$ oc new-project <project-name>
+
+$ oc adm policy add-scc-to-user privileged -z default
+
+$ oc create -f <template-path>/deploy-heketi-template
+
+https://github.com/heketi/heketi/blob/master/extras/openshift/templates/deploy-heketi-template.json
+
+
+
+oc process deploy-heketi -v HEKETI_KUBE_NAMESPACE=hekati HEKETI_KUBE_APIHOST=https://console.master.172.16.8.26.xip.io:8443 HEKETI_KUBE_INSECURE=y HEKETI_KUBE_USER=admin HEKETI_KUBE_PASSWORD=admin | oc create -f -
+
+
+
+oc process deploy-heketi -v \
+         HEKETI_KUBE_NAMESPACE=hekati \
+         HEKETI_KUBE_APIHOST=https://console.master.172.16.8.26.xip.io:8443 \
+         HEKETI_KUBE_INSECURE=y \
+         HEKETI_KUBE_USER=admin \
+         HEKETI_KUBE_PASSWORD=admin | oc create -f -
+
+
+$ oc get svc
+NAME            CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+deploy-heketi   172.30.96.173   <none>        8080/TCP   2m
+
+$ curl http://<cluster-ip>:8080/hello
+Hello from Heketi
+
+
+$ export HEKETI_CLI_SERVER=http://<cluster-ip>:8080
+
+topology.json is at the Botton of this email.
+
+
+# heketi-cli topology load -json=topology.json
+
+Create a Gluster volume to verify Heketi
+
+heketi-cli volume create --size=50
+
+$ gluster volume info
+
+Before you run a pod make sure Gluster libraries are installed on all worker nodes. Check Exception section for more details
+
+Pod
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gluster-pod1
+  labels:
+    name: gluster-pod1
+spec:
+  containers:
+  - name: gluster-pod1
+    image: gcr.io/google_containers/nginx-slim:0.8
+    ports:
+    - name: web
+      containerPort: 80
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - name: gluster-vol1
+      mountPath: /usr/share/nginx/html
+  volumes:
+  - name: gluster-vol1
+    persistentVolumeClaim:
+      claimName: gluster-dyn-pvc 
+
+
+
+Topology.json
+{
+  "clusters": [
+    {
+      "nodes": [
+        {
+          "node": {
+            "hostnames": {
+              "manage": [
+                "172.16.8.31"
+              ],
+              "storage": [
+                "172.16.8.31"
+              ]
+            },
+            "zone": 1
+          },
+          "devices": [
+            "/dev/sdc"
+          ]
+        },
+        {
+          "node": {
+            "hostnames": {
+              "manage": [
+                "172.16.8.32"
+              ],
+              "storage": [
+                "172.16.8.32"
+              ]
+            },
+            "zone": 1
+          },
+          "devices": [
+            "/dev/sdc"
+          ]
+        },
+        {
+          "node": {
+            "hostnames": {
+              "manage": [
+                "172.16.8.33"
+              ],
+              "storage": [
+                "172.16.8.33"
+              ]
+            },
+            "zone": 1
+          },
+          "devices": [
+            "/dev/sdc"
+          ]
+        },
+
+        {
+          "node": {
+            "hostnames": {
+              "manage": [
+                "172.16.8.34"
+              ],
+              "storage": [
+                "172.16.8.34"
+              ]
+            },
+            "zone": 1
+          },
+          "devices": [
+            "/dev/sdc"
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+/etc/heketi/heketi.json
+
+[root@glusterserver1 heketi]# cat heketi.json 
+{
+  "_port_comment": "Heketi Server Port Number",
+  "port": "8080",
+
+  "_use_auth": "Enable JWT authorization. Please enable for deployment",
+  "use_auth": false,
+
+  "_jwt": "Private keys for access",
+  "jwt": {
+    "_admin": "Admin has access to all APIs",
+    "admin": {
+      "key": "My Secret"
+    },
+    "_user": "User only has access to /volumes endpoint",
+    "user": {
+      "key": "My Secret"
+    }
+  },
+
+  "_glusterfs_comment": "GlusterFS Configuration",
+  "glusterfs": {
+    "_executor_comment": [
+      "Execute plugin. Possible choices: mock, ssh",
+      "mock: This setting is used for testing and development.",
+      "      It will not send commands to any node.",
+      "ssh:  This setting will notify Heketi to ssh to the nodes.",
+      "      It will need the values in sshexec to be configured.",
+      "kubernetes: Communicate with GlusterFS containers over",
+      "            Kubernetes exec api."
+    ],
+    "executor": "mock",
+
+    "_sshexec_comment": "SSH username and private key file information",
+    "sshexec": {
+      "keyfile": "/root/.ssh/id_rsa",
+      "user": "root",
+      "port": "Optional: ssh port.  Default is 22",
+      "fstab": "Optional: Specify fstab file on node.  Default is /etc/fstab"
+    },
+
+    "_kubeexec_comment": "Kubernetes configuration",
+    "kubeexec": {
+      "host" :"https://kubernetes.host:8443",
+      "cert" : "/path/to/crt.file",
+      "insecure": false,
+      "user": "kubernetes username",
+      "password": "password for kubernetes user",
+      "namespace": "OpenShift project or Kubernetes namespace",
+      "fstab": "Optional: Specify fstab file on node.  Default is /etc/fstab"
+    },
+
+    "_db_comment": "Database file name",
+    "db": "/var/lib/heketi/heketi.db",
+
+    "_loglevel_comment": [
+      "Set log level. Choices are:",
+      "  none, critical, error, warning, info, debug",
+      "Default is warning"
+    ],
+    "loglevel" : "debug"
+  }
+}
+
+
+
+
+Problems
+
+
+
+“Connection refused” vs “No route to host”
+
+
+Add an entry in Gluster server IP table
+
+sudo iptables -S
+
+sudo iptables -I INPUT 7 -p tcp --dport 8080 -m state --state NEW -j ACCEPT
+To verify
+sudo iptables -S
+
+
+
+
+
+8:48:55 PM	Warning	Failed Mount 	Unable to mount volumes for pod "nginx_my-project(07a271e2-b6ef-11e9-b36b-000d3a0b1a85)": timeout expired waiting for volumes to attach or mount for pod "my-project"/"nginx". list of unmounted volumes=[propfile default-token-jl4wn]. list of unattached volumes=[propfile default-token-jl4wn]
+
+This happens when there is something wrong in /etc/heketi/heketi.json. Mine happened because the ssh key path was incorrect
+
+
+
+[root@glusterserver1 adeelshafqat]# systemctl status heketi
+● heketi.service - Heketi Server
+   Loaded: loaded (/usr/lib/systemd/system/heketi.service; enabled; vendor preset: disabled)
+   Active: failed (Result: start-limit) since Mon 2019-08-05 11:29:29 UTC; 3s ago
+  Process: 2454 ExecStart=/usr/bin/heketi --config=/etc/heketi/heketi.json (code=exited, status=1/FAILURE)
+ Main PID: 2454 (code=exited, status=1/FAILURE)
+
+Aug 05 11:29:29 glusterserver1 systemd[1]: Unit heketi.service entered failed state.
+Aug 05 11:29:29 glusterserver1 systemd[1]: heketi.service failed.
+Aug 05 11:29:29 glusterserver1 systemd[1]: heketi.service holdoff time over, scheduling restart.
+Aug 05 11:29:29 glusterserver1 systemd[1]: start request repeated too quickly for heketi.service
+Aug 05 11:29:29 glusterserver1 systemd[1]: Failed to start Heketi Server.
+Aug 05 11:29:29 glusterserver1 systemd[1]: Unit heketi.service entered failed state.
+Aug 05 11:29:29 glusterserver1 systemd[1]: heketi.service failed.
+[root@glusterserver1 adeelshafqat]# 
+
+
+
+Failed to provision volume with StorageClass "glusterfs-storageclass": failed to create volume: failed to create volume: Failed to allocate new volume: No space
+
+Solution: This is because has only two nodes. It needs to have 3 nodes
+
+
+MountVolume.SetUp failed for volume "pvc-7d36d526-b862-11e9-bee5-e63e43415833" : mount failed: exit status 32 the following error information was pulled from the glusterfs log to help diagnose this issue: could not open log file for pod hekatinginx
+
+Solution: Client libraries are not installed on the machine which is running Kubernetes cluster
+
+
+
+
+5s        5s        1         nginx-pod.15b8664fb311f9b3   Pod                 Warning   FailedMount   kubelet, worker2.172.16.8.29.xip.io   MountVolume.SetUp failed for volume "pvc-96e52d9a-b864-11e9-b2f9-000d3a0b1a85" : mount failed: mount failed: exit status 1
+Mounting command: systemd-run
+Mounting arguments: --description=Kubernetes transient mount for /var/lib/origin/openshift.local.volumes/pods/8d907eb5-b871-11e9-a2db-000d3a0b1a85/volumes/kubernetes.io~glusterfs/pvc-96e52d9a-b864-11e9-b2f9-000d3a0b1a85 --scope -- mount -t glusterfs -o log-level=ERROR,log-file=/var/lib/origin/openshift.local.volumes/plugins/kubernetes.io/glusterfs/pvc-96e52d9a-b864-11e9-b2f9-000d3a0b1a85/nginx-pod-glusterfs.log,backup-volfile-servers=172.16.8.36:172.16.8.37:172.16.8.41 172.16.8.36:vol_69f3c824ab0fdd14cfd9c1b81f8e875c /var/lib/origin/openshift.local.volumes/pods/8d907eb5-b871-11e9-a2db-000d3a0b1a85/volumes/kubernetes.io~glusterfs/pvc-96e52d9a-b864-11e9-b2f9-000d3a0b1a85
+Output: Running scope as unit run-25825.scope.
+Mount failed. Please check the log file for more details.
+
+ the following error information was pulled from the glusterfs log to help diagnose this issue: 
+[2019-08-06 17:42:43.002708] E [MSGID: 100026] [glusterfsd.c:2351:glusterfs_process_volfp] 0-: failed to construct the graph
+[2019-08-06 17:42:43.002936] E [graph.c:1142:glusterfs_graph_destroy] (-->/usr/sbin/glusterfs(mgmt_getspec_cbk+0x532) [0x56458f128332] -->/usr/sbin/glusterfs(glusterfs_process_volfp+0x150) [0x56458f121e60] -->/lib64/libglusterfs.so.0(glusterfs_graph_destroy+0x84) [0x7fc240ef11e4] ) 0-graph: invalid argument: graph [Invalid argument]
+
+
+Solution: Gluster FS libraries should be installed on worker nodes
+
+# yum install centos-release-gluster -y
+# yum install epel-release -y
+# yum install glusterfs-server -y
+$ yum install glusterfs-fuse
