@@ -11,7 +11,7 @@ Before you run a pod make sure Gluster libraries are installed on all OpenShift 
 
 
 https://docs.oracle.com/cd/E52668_01/F18418/html/gluster-heketi.html#gluster-heketi-install
-
+https://docs.openshift.com/container-platform/3.4/install_config/storage_examples/gluster_dynamic_example.html
 https://access.redhat.com/documentation/en-us/red_hat_gluster_storage/3.1/html/administration_guide/ch06s02
 
 https://www.youtube.com/watch?v=uaNZx2O9ihc
