@@ -1,0 +1,56 @@
+{
+  "clusters": [
+    {
+      "nodes": [
+        {
+          "node": {
+            "hostnames": {
+              "manage": [
+                "gserver1"
+              ],
+              "storage": [
+                "172.16.8.36"
+              ]
+            },
+            "zone": 1
+          },
+          "devices": [
+            "/dev/sdc"
+          ]
+        },
+       {
+          "node": {
+            "hostnames": {
+              "manage": [
+                "gserver2"
+              ],
+              "storage": [
+                "172.16.8.37"
+              ]
+            },
+            "zone": 1
+          },
+          "devices": [
+            "/dev/sdc"
+          ]
+        },
+        {
+          "node": {
+            "hostnames": {
+              "manage": [
+                "gserver3"
+              ],
+              "storage": [
+                "172.16.8.41"
+              ]
+            },
+            "zone": 1
+          },
+          "devices": [
+            "/dev/sdc"
+          ]
+        }
+      ]
+    }
+  ]
+}
