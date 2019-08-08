@@ -351,6 +351,7 @@ spec:
 
 
 Topology.json
+
 {
   "clusters": [
     {
@@ -359,10 +360,26 @@ Topology.json
           "node": {
             "hostnames": {
               "manage": [
-                "172.16.8.31"
+                "gserver1"
               ],
               "storage": [
-                "172.16.8.31"
+                "172.16.8.36"
+              ]
+            },
+            "zone": 1
+          },
+          "devices": [
+            "/dev/sdc"
+          ]
+        },
+       {
+          "node": {
+            "hostnames": {
+              "manage": [
+                "gserver2"
+              ],
+              "storage": [
+                "172.16.8.37"
               ]
             },
             "zone": 1
@@ -375,43 +392,10 @@ Topology.json
           "node": {
             "hostnames": {
               "manage": [
-                "172.16.8.32"
+                "gserver3"
               ],
               "storage": [
-                "172.16.8.32"
-              ]
-            },
-            "zone": 1
-          },
-          "devices": [
-            "/dev/sdc"
-          ]
-        },
-        {
-          "node": {
-            "hostnames": {
-              "manage": [
-                "172.16.8.33"
-              ],
-              "storage": [
-                "172.16.8.33"
-              ]
-            },
-            "zone": 1
-          },
-          "devices": [
-            "/dev/sdc"
-          ]
-        },
-
-        {
-          "node": {
-            "hostnames": {
-              "manage": [
-                "172.16.8.34"
-              ],
-              "storage": [
-                "172.16.8.34"
+                "172.16.8.41"
               ]
             },
             "zone": 1
@@ -425,9 +409,11 @@ Topology.json
   ]
 }
 
+
+
+
 /etc/heketi/heketi.json
 
-[root@glusterserver1 heketi]# cat heketi.json 
 {
   "_port_comment": "Heketi Server Port Number",
   "port": "8080",
@@ -439,11 +425,11 @@ Topology.json
   "jwt": {
     "_admin": "Admin has access to all APIs",
     "admin": {
-      "key": "My Secret"
+      "key": "admin"
     },
     "_user": "User only has access to /volumes endpoint",
     "user": {
-      "key": "My Secret"
+      "key": "admin"
     }
   },
 
@@ -458,14 +444,15 @@ Topology.json
       "kubernetes: Communicate with GlusterFS containers over",
       "            Kubernetes exec api."
     ],
-    "executor": "mock",
+    "executor": "ssh",
 
     "_sshexec_comment": "SSH username and private key file information",
     "sshexec": {
-      "keyfile": "/root/.ssh/id_rsa",
+    "sshexec": {
+      "keyfile": "/etc/heketi/heketi_key",
       "user": "root",
-      "port": "Optional: ssh port.  Default is 22",
-      "fstab": "Optional: Specify fstab file on node.  Default is /etc/fstab"
+      "port": "22",
+      "fstab": "/etc/fstab"
     },
 
     "_kubeexec_comment": "Kubernetes configuration",
