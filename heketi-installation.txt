@@ -9,61 +9,35 @@ Do not format the disks to use for volumes. The disks must be in RAW format to u
 
 Before you run a pod make sure Gluster libraries are installed on all OpenShift worker nodes. Check Exception section for more details
 
-
+Useful Links
 https://docs.oracle.com/cd/E52668_01/F18418/html/gluster-heketi.html#gluster-heketi-install
 https://docs.openshift.com/container-platform/3.4/install_config/storage_examples/gluster_dynamic_example.html
 https://access.redhat.com/documentation/en-us/red_hat_gluster_storage/3.1/html/administration_guide/ch06s02
-
 https://www.youtube.com/watch?v=uaNZx2O9ihc
 
+
+Heketi and Gluster Commands 
+gluster volume info 20075fdfb097fa04473cae1e35598bd2
+gluster cluster info 225194577745138dd4a71fda2f51e5e0
+gluster volume info all
+gluster volume list
 heketi-cli --server http://172.16.8.40:8080 --user admin --secret admin volume list
-
-
-
-
-   27  yum install centos-release-gluster -y
-   28  yum install epel-release -y
-   29  yum install heketi
-   30  yum install heketi-client
-   31  cd /
-   32  ssh-keygen -f /etc/heketi/heketi_key -t rsa -N ''
-   33  ssh-copy-id -i /etc/heketi/heketi_key.pub root@172.16.8.36
-   34  cat /etc/heketi/heketi_key.pub
-   35  chown heketi:heketi /etc/heketi/heketi_key*
-   36  cd /ect/heketi
-   37  cd /ect/heketi
-   38  cd /etc/heketi
-   39  ls -lrt
-   40  ssh heketi_key root@172.16.8.36
-   41* ssh -i root@172.16.8.36
-   42  ssh -i heketi_key root@172.16.8.36
-   43  ssh -i heketi_key root@172.16.8.37
-
-
-
-
-
-
-  323  heketi-cli volume create --size=50
-  324  gluster volume info
-  325  gluster volume info
-  326  heketi-cli volume create --size=50
-  327  gluster volume info vol_20075fdfb097fa04473cae1e35598bd2
-  328  gluster volume info 20075fdfb097fa04473cae1e35598bd2
-  329  gluster volume info
-  330  gluster cluster info 225194577745138dd4a71fda2f51e5e0
-  331  gluster volume info all
-  332  gluster volume list
-  333  heketi-cli volume create --size=50
-  334  heketi-cli cluster list
-  335  heketi-cli cluster info 225194577745138dd4a71fda2f51e5e0
-  336  heketi-cli volume info 20075fdfb097fa04473cae1e35598bd2
-
+heketi-cli volume create --size=50
+heketi-cli cluster list
+heketi-cli cluster info 225194577745138dd4a71fda2f51e5e0
+heketi-cli volume info 20075fdfb097fa04473cae1e35598bd2
 systemctl stop heketi
 systemctl start heketi
 systemctl status heketi
 
 
+Packages Required to Run Heketi
+yum install centos-release-gluster -y
+yum install epel-release -y
+yum install heketi
+yum install heketi-client
+
+Steps
 
 yum install heketi
 [root@glusterserver1 log]# sudo -u heketi ssh-keygen
@@ -100,20 +74,13 @@ Copy this in all Gluster servers /root/.ssh/authorized_keys files
 
 
 
-	ssh-keygen -f /etc/heketi/heketi_key -t rsa -N ''
-   33  ssh-copy-id -i /etc/heketi/heketi_key.pub root@172.16.8.36
-   34  cat /etc/heketi/heketi_key.pub
-   35  chown heketi:heketi /etc/heketi/heketi_key*
-   36  cd /ect/heketi
-   37  cd /ect/heketi
-   38  cd /etc/heketi
-   39  ls -lrt
-   40  ssh heketi_key root@172.16.8.36
-   41* ssh -i root@172.16.8.36
-   42  ssh -i heketi_key root@172.16.8.36
-   43  ssh -i heketi_key root@172.16.8.37
-
-
+ssh-keygen -f /etc/heketi/heketi_key -t rsa -N ''
+ssh-copy-id -i /etc/heketi/heketi_key.pub root@172.16.8.36
+cat /etc/heketi/heketi_key.pub
+chown heketi:heketi /etc/heketi/heketi_key*
+cd /etc/heketi
+ls -lrt
+ssh heketi_key root@172.16.8.36
 
 
 vi /etc/heketi/heketi.json
@@ -133,7 +100,7 @@ Change       "keyfile": "/root/.ssh/id_rsa”, to /var/lib/heketi/.ssh/id_rsa
 
 Setup the heketi.json configuration file. The file is located in ß/etc/heketi/heketi.json. (at the bottom of the page)
 
- systemctl enable heketi
+systemctl enable heketi
 systemctl start heketi
 systemctl status heketi
 # chkconfig --add heketi
